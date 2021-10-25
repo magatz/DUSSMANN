@@ -1,3 +1,4 @@
+/* libname aaa "/mnt/storage/sasdata/DUSSMANN/"; */
 proc fedsql sessref=mySession;
  create table casuser.step_1  {options replace=true}  as
 select
@@ -19,6 +20,9 @@ from
  
 quit;
 
+/* data aaa.ds_gare_punteggi; */
+/*  set casuser.step_1; */
+/* run; */
 proc contents data=dussmann.cat_by_gara out=tmp noprint;
 run;
 
@@ -76,6 +80,13 @@ select distinct
 /*  --and gga_cod_gara=12348957 */
 quit;
 
+
+
+
+/* data aaa.ds_gare_dumm; */
+/*  set casuser.step_2; */
+/* run; */
+
 /* non dussmann  */
 proc fedsql sessref=mySession;
 create table casuser.step_3 {options replace=true} as
@@ -122,3 +133,7 @@ left join dussmann.cat_by_gara as X on 			(A.gga_cod_gara=X.gct_cod_gara)
 left join dussmann.gar_gare_struttura as Y on 	(Y.gst_cod_gara=A.gga_cod_gara) 
 		where Y.gst_cod_gara is null;
 quit;
+
+/* data aaa.ds_gare_no_dumm; */
+/*  set casuser.step_3; */
+/* run; */
