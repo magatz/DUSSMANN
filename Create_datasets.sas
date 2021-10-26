@@ -32,9 +32,9 @@ quit;
 
 %put &all_cat;
 
-/* Dussmann world */
-proc fedsql sessref=mySession;
-create table casuser.step_2 {options replace=true} as
+/* Dussmann world  CHECKED*/
+proc fedsql /*sessref=mySession*/;
+create table dussmann.gare_dussmann   as
 select distinct
 	A.gga_cod_gara,
 	A.gga_scad_iscrizione,
@@ -67,20 +67,16 @@ select distinct
 	left join dussmann.gar_clienti as c on (gga_cliente=gcl_cod_cliente)
 	left join dussmann.gar_stato_av as D  on (B.gub_cod_avanzamento=D.gsa_cod_stato_av)
 	left join dussmann.gar_stato as E on (gga_stato=gst_cod_stato)
-	left join dussmann.cat_by_gara as X on (gga_cod_gara=gct_cod_gara)
-	
-
+	left join dussmann.cat_by_gara as X on (A.gga_cod_gara=X.gct_cod_gara)
 	left join dussmann.gar_gare_categorie as G on (A.gga_cod_gara=G.gct_cod_gara)
 	left join dussmann.gar_gare_settori as F on (A.gga_cod_gara=ggs_cod_gara)
-	
-	left join dussmann.gar_gare_struttura as Y on (Y.gst_cod_gara=A.gga_cod_gara) 
-		where Y.gst_cod_gara is not  null;
 
-
-/*  --and gga_cod_gara=12348957 */
+	/* controlla i duplicati sulle strutture  da gestire !!!*/
+	left join work.struct as Y on 	(Y.gst_cod_gara=A.gga_cod_gara) 
+		where Y.gst_cod_gara is not null;
 quit;
 
-
+%put &sysver;
 
 
 /* data aaa.ds_gare_dumm; */
@@ -88,8 +84,8 @@ quit;
 /* run; */
 
 /* non dussmann  */
-proc fedsql sessref=mySession;
-create table casuser.step_3 {options replace=true} as
+proc fedsql ;
+create table dussmann.gare_no_dusmann  as
 select distinct 
 	A.gga_cod_gara,
 	A.gga_scad_iscrizione,
@@ -127,10 +123,12 @@ left join dussmann.gar_clienti as c on 					(A.gga_cliente=gcl_cod_cliente)
 left join dussmann.gar_gare_categorie on 				(A.gga_cod_gara=gct_cod_gara)
 left join dussmann.gar_gare_ubicazioni as B on 			(A.gga_cod_gara=gub_cod_gara)
 left join dussmann.gar_gare_settori on 					(A.gga_cod_gara=ggs_cod_gara)
-left join dussmann.gar_stato_av as D on 					(B.gub_cod_avanzamento=D.gsa_cod_stato_av)
+left join dussmann.gar_stato_av as D on 				(B.gub_cod_avanzamento=D.gsa_cod_stato_av)
 left join dussmann.gar_csv_esiti as F on 				(F.gce_rifgara=A.gga_cod_gara)
+/* verifica con  cat_by_gara dedup */
 left join dussmann.cat_by_gara as X on 			(A.gga_cod_gara=X.gct_cod_gara)
-left join dussmann.gar_gare_struttura as Y on 	(Y.gst_cod_gara=A.gga_cod_gara) 
+/* controlla i duplicati sulle strutture  da gestire !!!*/
+left join work.struct as Y on 	(Y.gst_cod_gara=A.gga_cod_gara) 
 		where Y.gst_cod_gara is null;
 quit;
 

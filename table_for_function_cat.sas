@@ -32,6 +32,10 @@ data dussmann.cat_by_gara;
 	by gct_cod_gara;
 run;
 
+proc sort data=dussmann.cat_by_gara nodupkey;
+by gct_cod_gara;
+run;
+
 
 
 
@@ -64,4 +68,9 @@ run;
 proc transpose data=t1b_dedup prefix=cat_dussmann_ out=sett_by_gara(drop=_name_ _label_);
 	by gga_cod_gara;
 	var gga_settore_dussmann;
+run;
+
+
+proc sort data=dussmann.gar_gare_struttura nodupkey out=work.struct;
+by gst_cod_gara;
 run;
