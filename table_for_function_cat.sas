@@ -40,37 +40,35 @@ run;
 
 
 proc sql;
-	create table work.t1b as select distinct  gga_cod_gara, gga_settore_dussmann from 
-		dussmann.gar_gare;
+	create table work.t1b as select distinct   ggs_cod_gara, ggs_cod_settore from 
+		dussmann.gar_gare_settori;
 quit;
 
-proc sort data=work.t1b out=t1b_dedup dupout=t1b_dup nodup;
- by gga_cod_gara gga_settore_dussmann;
+proc sort data=work.t1b out=t1b_dedup dupout=t1b_dup nodupkey;
+ by ggs_cod_gara ggs_cod_settore;
+run;
+
+proc sort data=dussmann.gar_gare_settori dupout=pluto nodupkey out=pippo;
+ by ggs_cod_gara ;
 run;
 
 
-data work.t2b (keep=gga_cod_gara gga_settore_dussmann settori);
+data work.t2b (keep=ggs_cod_gara ggs_cod_settore settori );
 	set work.t1b_dedup;
 	length settori $500;
-	by gga_cod_gara;
+	by ggs_cod_gara;
 	retain settori;
 
-	if first.gga_cod_gara and last.gga_cod_gara then
-		settori=gga_settore_dussmann;
+	if first.ggs_cod_gara and last.ggs_cod_gara then
+		settori=ggs_cod_settore;
 
-	if first.gga_cod_gara and not last.gga_cod_gara then
-		settori=gga_settore_dussmann;
-
-	else if not first.gga_cod_gara  then
-		settori=catx(" | ", settori, gga_settore_dussmann);
+	if not first.ggs_cod_gara then
+		settori=catx(" | ", settori, ggs_cod_settore);
 run;
 
-proc transpose data=t1b_dedup prefix=cat_dussmann_ out=sett_by_gara(drop=_name_ _label_);
-	by gga_cod_gara;
-	var gga_settore_dussmann;
+proc transpose data=t2b prefix=sett_dussmann_ out=sett_by_gara(drop=_name_ _label_);
+	by ggs_cod_gara;
+	var ggs_cod_settore;
 run;
 
 
-proc sort data=dussmann.gar_gare_struttura nodupkey out=work.struct;
-by gst_cod_gara;
-run;
